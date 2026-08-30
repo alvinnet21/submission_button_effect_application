@@ -57,7 +57,7 @@ react {
 /**
  * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
@@ -77,9 +77,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.taskapplication"
+    namespace "com.alvin.buttoneffect"
     defaultConfig {
-        applicationId "com.taskapplication"
+        applicationId "com.alvin.buttoneffect"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -92,17 +92,39 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            // Loads credentials from android/gradle.properties (or ~/.gradle/gradle.properties).
+            // Keep the keystore & these secrets OUT of version control.
+            if (project.hasProperty('TASKAPP_UPLOAD_STORE_FILE')) {
+                storeFile file(TASKAPP_UPLOAD_STORE_FILE)
+                storePassword TASKAPP_UPLOAD_STORE_PASSWORD
+                keyAlias TASKAPP_UPLOAD_KEY_ALIAS
+                keyPassword TASKAPP_UPLOAD_KEY_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            // Uses the release keystore when its credentials are provided,
+            // otherwise falls back to debug signing so the project still builds.
+            signingConfig project.hasProperty('TASKAPP_UPLOAD_STORE_FILE') ? signingConfigs.release : signingConfigs.debug
+            // R8 code shrinking, obfuscation & optimization (anti reverse-engineering).
             minifyEnabled enableProguardInReleaseBuilds
+            // Remove unused resources from the release build.
+            shrinkResources enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+
+    /**
+     * Name the single output APK "AlvinTaskApplication.apk".
+     */
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "AlvinButtonEffectApplication.apk"
         }
     }
 }

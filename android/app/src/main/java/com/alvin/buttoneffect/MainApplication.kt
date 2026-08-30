@@ -1,4 +1,4 @@
-package com.taskapplication
+package com.alvin.buttoneffect
 
 import android.app.Application
 import com.facebook.react.PackageList

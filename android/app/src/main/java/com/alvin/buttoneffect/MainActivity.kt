@@ -1,4 +1,4 @@
-package com.taskapplication
+package com.alvin.buttoneffect
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
