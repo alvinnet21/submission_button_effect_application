@@ -33,6 +33,8 @@ build/
 *.keystore
 !debug.keystore
 .kotlin/
+.android/build
+.android/app/build
 
 # node.js
 #
